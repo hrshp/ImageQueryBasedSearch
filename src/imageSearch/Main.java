@@ -3,6 +3,7 @@ package imageSearch;
 import javafx.scene.image.Image;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import javafx.application.Application;
 import javafx.concurrent.WorkerStateEvent;
@@ -11,6 +12,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
@@ -173,9 +175,10 @@ public class Main extends Application {
 	            	webParserService.setOnCompleterListener(new OnCompleteListener() {
 						
 						@Override
-						public void updateUI(Node node) {
+						public void updateUI(ArrayList<Hyperlink> list) {
 							// TODO Auto-generated method stub
-							linksLayout.getChildren().add(node);
+							for (Hyperlink link : list)
+								linksLayout.getChildren().add(link);
 						}
 					});
 	            	webParserService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {

@@ -1,10 +1,13 @@
 package imageSearch;
 
+import java.util.ArrayList;
+
 import javax.swing.JFrame;
 
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.scene.Node;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.layout.VBox;
 
 public class WebParserService extends Service<Void>{
@@ -35,9 +38,9 @@ public class WebParserService extends Service<Void>{
                 wp.setOnCompleteListener(new OnCompleteListener() {
 					
 					@Override
-					public void updateUI(Node node) {
+					public void updateUI(ArrayList<Hyperlink> list) {
 						// TODO Auto-generated method stub
-						onCompleteListener.updateUI(node);
+						onCompleteListener.updateUI(list);
 					}
 				});
 				return null;

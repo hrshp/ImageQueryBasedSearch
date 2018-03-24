@@ -4,9 +4,12 @@ package imageSearch;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.List;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.sql.Array;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
@@ -30,6 +33,7 @@ public class WebsiteParser extends JTabbedPane
     VBox linksLayout;
     URI uri = null;
     String l;
+    ArrayList<Hyperlink> list;
     
     OnCompleteListener onCompleteListener;
     
@@ -63,7 +67,8 @@ public class WebsiteParser extends JTabbedPane
 //                SwingLink label = new SwingLink(link.text(),l);
                 Hyperlink label = new Hyperlink();
                 label.setText(link.text());
-                label.setOnAction(new EventHandler<>() {
+                System.out.println(link.text());
+                label.setOnAction(new EventHandler<ActionEvent>() {
 					
 					@Override
 					public void handle(ActionEvent arg0) {
@@ -86,17 +91,20 @@ public class WebsiteParser extends JTabbedPane
 		                }
 					}
 				});
-                onCompleteListener.updateUI(label);
+                list.add(label);
             }
         }
-            
+          
+        for (Hyperlink link : list)
+        	System.out.println(link.getText());
+        onCompleteListener.updateUI(list);
     }
     
-    public void updateUI(Node label) {
-    	linksLayout.getChildren().add(label);
-    }
+//    public void updateUI(Node label) {
+//    	linksLayout.getChildren().add(label);
+//    }
 }
 
 interface OnCompleteListener{
-	void updateUI(Node node);
+	void updateUI(ArrayList<Hyperlink> list);
 }
