@@ -1,29 +1,42 @@
 package imageSearch;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import javax.swing.JFrame;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import javafx.scene.Node;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.layout.VBox;
+
 
 public class WebParserService extends Service<Void>{
-	
-	private String tag;
-	private VBox linksLayout;
-	OnCompleteListener onCompleteListener;
 
-	public WebParserService(String tag, VBox linksLayout) {
-		this.tag = tag;
-		this.linksLayout = linksLayout;
+	Document doc;
+	String tag;
+	
+	static class Pair{
+		String text;
+		String uri;
+		public Pair(String text, String uri) {
+			this.text = text;
+			this.uri = uri;
+		}
+		
 	}
 	
-	void setOnCompleterListener(OnCompleteListener onCompleteListener) {
-		this.onCompleteListener = onCompleteListener;
+	ArrayList<Pair> list;
+	
+	
+	public WebParserService(String tag) {
+		this.tag = tag;
+		this.list = new ArrayList<Pair>();
 	}
+
 
 	@Override
 	protected Task<Void> createTask() {
@@ -34,20 +47,28 @@ public class WebParserService extends Service<Void>{
 			protected Void call() throws Exception {
 				// TODO Auto-generated method stub
 				
-                WebsiteParser wp = new WebsiteParser(tag, linksLayout);
-                wp.setOnCompleteListener(new OnCompleteListener() {
-					
-					@Override
-					public void updateUI(ArrayList<Hyperlink> list) {
-						// TODO Auto-generated method stub
-						onCompleteListener.updateUI(list);
-					}
-				});
+				try {
+		            doc = Jsoup.connect("https://www.google.com/search?q=" + tag).get();
+		        } catch (IOException ex) {
+		            Logger.getLogger(WebParserService.class.getName()).log(Level.SEVERE, null, ex);
+		        }	
+				
+				Elements links = doc.getElementsByTag("a");
+				for(Element link : links)
+		        {
+		            String l=link.attr("href");//actual link where the url will go to. HREF is the attribute of the href tag
+		            if(l.length()>0)
+		            {
+		                if(l.length()<4)
+		                    l = doc.baseUri()+l.substring(1);
+		                else if(!l.substring(0,4).equals("http"))
+		                    l = doc.baseUri()+l.substring(1);
+		            }
+		            Pair pair = new Pair(link.text(), l);
+		           list.add(pair);
+		        }
 				return null;
-			}
-			
-		};
+			}};
 	}
 
 }
-

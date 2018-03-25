@@ -2,14 +2,19 @@ package imageSearch;
 
 import javafx.scene.image.Image;
 
+import java.awt.Desktop;
 import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javafx.application.Application;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.event.ActionEvent;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
@@ -17,10 +22,8 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Background;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
@@ -122,6 +125,37 @@ public class Main extends Application {
 		top = new HBox();
 		linksLayout = new VBox();
 		
+		Hyperlink link = new Hyperlink();
+		link.setText("click here");
+		link.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				try {
+					uri = new URI("https://www.google.co.in/");
+					
+				} catch (URISyntaxException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				if(Desktop.isDesktopSupported())
+				{
+					try {
+						Desktop desktop = Desktop.getDesktop();
+						desktop.browse(uri);
+						System.out.println("try2 passed");//////////////
+					} catch (IOException ex) {
+						Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+						System.out.println("try2 failes");//////////////
+					}
+
+				}
+			}
+		});
+		linksLayout.getChildren().add(link);
+		
 		controlLayout = new VBox();
 		controlLayout.getChildren().addAll(uploadButton, detectButton);
 		
@@ -138,63 +172,79 @@ public class Main extends Application {
 		top.getChildren().addAll(imageView, controlLayout);
 		
 		mainLayout.getChildren().addAll(top, linkScroll);
-		
-		
-		
-		
-		
-//		mainLayout = new BorderPane();
-//
-//		mainLayout.setCenter(imageView);
-//
-//		leftLayout = new VBox();		
-//		leftLayout.getChildren().addAll(uploadButton, detectButton);		
-//		mainLayout.setLeft(leftLayout);
-//		
-//		bottomLayout = new VBox();
-////		scrollPane = new ScrollPane();
-////		scrollPane.setContent(bottomLayout);
-////		
-////		mainLayout.setBottom(scrollPane);
-		
+				
 		scene = new Scene(mainScroll, 1200, 700);
 		
 		stage.setScene(scene);
 		stage.show();
+		
+		
 	}
 	
+	
+	private String Uri;
+	private URI uri;
 	public void updateUI(String[] tags) {
 		tagButton = new Button[tags.length];
+		
 		for (int i=0 ; i<tags.length ; ++i) {
 			tagButton[i] = new Button(tags[i]);
 			final String tag = tags[i];
 			tagButton[i].setOnAction(new EventHandler<ActionEvent>() {
+				
 	            @Override
 	            public void handle(ActionEvent event) {
-	            	WebParserService webParserService = new WebParserService(tag, linksLayout);
-	            	webParserService.setOnCompleterListener(new OnCompleteListener() {
-						
-						@Override
-						public void updateUI(ArrayList<Hyperlink> list) {
-							// TODO Auto-generated method stub
-							for (Hyperlink link : list)
-								linksLayout.getChildren().add(link);
-						}
-					});
-	            	webParserService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-
-						@Override
-						public void handle(WorkerStateEvent arg0) {
-							// TODO Auto-generated method stub
-							System.out.println("completed web search!");
-							
-						}
-					});
-	            	webParserService.start();
+	            	System.out.println("runWebParser");
+	            	runWebParserService(tag);
 	            }
 	        });
 			controlLayout.getChildren().add(tagButton[i]);
 		}
+	}
+	
+	public void runWebParserService(String tag) {
+		WebParserService webParserService = new WebParserService(tag);
+		System.out.println("running webParserSucceed");
+    	webParserService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+
+			@Override
+			public void handle(WorkerStateEvent arg0) {
+				// TODO Auto-generated method stub
+				ArrayList<WebParserService.Pair> list = webParserService.list;
+				for (WebParserService.Pair pair : list) {
+					Hyperlink link = new Hyperlink();
+					link.setText(pair.text);
+					Uri = pair.uri;
+					link.setOnAction(new EventHandler<ActionEvent>() {
+
+						@Override
+						public void handle(ActionEvent arg0) {
+							// TODO Auto-generated method stub
+							try {
+								uri = new URI(Uri);
+								
+							} catch (URISyntaxException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							
+							if(Desktop.isDesktopSupported())
+							{
+								try {
+									Desktop desktop = Desktop.getDesktop();
+									desktop.browse(uri);
+								} catch (IOException ex) {
+									Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+								}
+
+							}
+						}
+					});
+					linksLayout.getChildren().add(link);
+				}
+			}
+		});
+    	webParserService.start();
 	}
 	
 	

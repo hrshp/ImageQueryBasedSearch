@@ -34,7 +34,7 @@ public class MyService extends Service<Void>{
 		            String command = "./darknet detect cfg/yolo.cfg yolo.weights " + filePath + " -thresh 0.5";
 		            Process proc = null;
 		            try {
-		                proc = Runtime.getRuntime().exec(command,null,new File("/home/aditi/eclipse-workspace/ImageSearch/darknet/"));
+		                proc = Runtime.getRuntime().exec(command,null,new File("/home/aditi/DarkNet/darknet"));
 		            } catch (IOException ex) {
 		                Logger.getLogger(MyService.class.getName()).log(Level.SEVERE, null, ex);
 		            }
