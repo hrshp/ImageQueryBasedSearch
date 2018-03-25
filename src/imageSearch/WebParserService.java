@@ -27,6 +27,27 @@ public class WebParserService extends Service<Void>{
 			this.uri = uri;
 		}
 		
+		public boolean isValid() {
+			String[] check = {"",
+							  "\n\n",
+							  "Consumer Ads Help Center",
+							  "\n",
+							  "Cached",
+							  "Similar",
+							  "Cached\n",
+							  "Similar\n",
+							  "Ads Settings",
+							  "Why This Ad page",
+							  "Feedback"};
+			
+			for (int i=0 ; i<check.length ; ++i) {
+				if (this.text.equals(check[i])) {
+					return false;
+				}
+			}
+			return true;
+		}
+		
 	}
 	
 	ArrayList<Pair> list;

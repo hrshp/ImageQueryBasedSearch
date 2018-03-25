@@ -124,6 +124,8 @@ public class Main extends Application {
 		
 		top = new HBox();
 		linksLayout = new VBox();
+		linksLayout.setPrefWidth(1000);
+		linksLayout.setPrefHeight(400);
 		
 		Hyperlink link = new Hyperlink();
 		link.setText("click here");
@@ -211,36 +213,21 @@ public class Main extends Application {
 			public void handle(WorkerStateEvent arg0) {
 				// TODO Auto-generated method stub
 				ArrayList<WebParserService.Pair> list = webParserService.list;
-				for (WebParserService.Pair pair : list) {
-					Hyperlink link = new Hyperlink();
-					link.setText(pair.text);
-					Uri = pair.uri;
-					link.setOnAction(new EventHandler<ActionEvent>() {
-
-						@Override
-						public void handle(ActionEvent arg0) {
-							// TODO Auto-generated method stub
-							try {
-								uri = new URI(Uri);
-								
-							} catch (URISyntaxException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-							
-							if(Desktop.isDesktopSupported())
-							{
-								try {
-									Desktop desktop = Desktop.getDesktop();
-									desktop.browse(uri);
-								} catch (IOException ex) {
-									Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-								}
-
-							}
-						}
-					});
-					linksLayout.getChildren().add(link);
+				boolean swich = false;
+				for (int i=0 ; i<list.size() ; ++i) {
+					WebParserService.Pair pair = list.get(i);
+					if (pair.text.equals("Tools")) {
+						swich = true;
+						continue;
+					}
+					
+					if (pair.text.equals("2"))
+	      				break;
+					
+					if (swich && pair.isValid()) {
+						MyHyperlink link = new MyHyperlink(pair.text+"\n", pair.uri);
+						linksLayout.getChildren().add(link);
+					}
 				}
 			}
 		});
